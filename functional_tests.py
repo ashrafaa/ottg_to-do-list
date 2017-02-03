@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import test
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
@@ -17,18 +19,32 @@ class NewVisitorTest(unittest.TestCase):
         # He notices the page title and header mention to-do lists
         #assert 'To-Do' in browser.title, "Browser title was " + browser.title
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the test!')
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
         # He is asked to enter the first to-do item straight away
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            'Enter a to-do item'
+        )
 
         # He types in buy some cat foods
+        inputbox.send_keys('Buy some cat foods')
 
         # When he hits enter, the page updates and now the page lists
         # "1. Buy some cat foods"
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: Buy some cat foods' for row in rows)
+        )
         # There is still text box to add another item.
         # He types in repair the car
-
+        self.fail('Finish the test')
         # The page updates again and shows both items in his list
 
         # He wonders if the site will remember her list. Then he sees
