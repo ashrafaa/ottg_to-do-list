@@ -6,10 +6,16 @@ import unittest
 class NewVisitorTest(unittest.TestCase):
 
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        #self.browser = webdriver.Firefox()
+        self.browser = webdriver.Chrome()
 
     def tearDown(self):
         self.browser.quit();
+
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Ash has heard about a new online to-do list app.
@@ -36,17 +42,8 @@ class NewVisitorTest(unittest.TestCase):
         # "1. Buy some cat foods"
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
+        self.check_for_row_in_list_table('1: Buy some cat foods')
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        # self.assertTrue(
-        #     any(row.text == '1: Buy some cat foods' for row in rows),
-        #     "New to-do item did not appear in table - its text was: \n %s" % (
-        #     table.text,
-        #     )
-        # or with this:
-        self.assertIn('1: Buy some cat foods', [row.text for row in rows])
-        #)
         # There is still text box to add another item.
         # He types in repair the car
         inputbox = self.browser.find_element_by_id('id_new_item')
@@ -55,10 +52,8 @@ class NewVisitorTest(unittest.TestCase):
         time.sleep(1)
 
         # The page updates again and shows both items in his list
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Buy some cat foods', [row.text for row in rows])
-        self.assertIn('2: Repair the car', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Buy some cat foods')
+        self.check_for_row_in_list_table('2: Repair the car')
 
         # He wonders if the site will remember her list. Then he sees
         # the site has generated a unique URL for her. Text is explanatory
